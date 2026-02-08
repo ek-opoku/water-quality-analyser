@@ -257,21 +257,22 @@ if dt_col:
 with st.expander("🗺️ Regional Overview & Comparative Hydrology", expanded=True):
     col_reg1, col_reg2 = st.columns(2)
     
-    # Leaderboard
+    # Fleet Leaderboard (Turbidity)
     with col_reg1:
         st.subheader("🏆 Site Health Leaderboard")
-        # Group by specific Location for granular view
-        site_stats = df.groupby(['Location', 'River_Name'])[['Turbidity_NTU', 'Dissolved_Oxygen_mgL']].mean().reset_index()
-        site_stats = site_stats.sort_values(by='Turbidity_NTU', ascending=False)
+        # Group by River (Average of Upstream + Downstream)
+        river_stats = df.groupby('River_Name')[['Turbidity_NTU', 'Dissolved_Oxygen_mgL']].mean().reset_index()
+        river_stats = river_stats.sort_values(by='Turbidity_NTU', ascending=False)
         
         fig_leader = px.bar(
-            site_stats, 
-            x='Location', 
+            river_stats, 
+            x='River_Name', 
             y='Turbidity_NTU', 
-            title="Avg Turbidity by Site (Lower is Better)",
-            hover_data=['River_Name', 'Dissolved_Oxygen_mgL'],
+            title="Avg Turbidity by River (NTU)",
+            hover_data=['Dissolved_Oxygen_mgL'],
             color='Turbidity_NTU',
-            color_continuous_scale=['green', 'yellow', 'red']
+            color_continuous_scale=['green', 'yellow', 'red'],
+            labels={'Turbidity_NTU': 'Avg Turbidity (NTU)', 'River_Name': 'River'}
         )
         st.plotly_chart(fig_leader, use_container_width=True)
 
